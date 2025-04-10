@@ -1,0 +1,45 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Formulário de Ingestões</title>
+</head>
+<body>
+  <h1>Cadastro de Ingestões</h1>
+  <form id="form-ingestao">
+    <label for="nome">Nome:</label><br />
+    <input type="text" id="nome" name="nome" required><br /><br />
+    
+    <label for="descricao">Descrição:</label><br />
+    <input type="text" id="descricao" name="descricao" required><br /><br />
+
+    <button type="submit">Enviar</button>
+  </form>
+
+  <script>
+    const form = document.getElementById("form-ingestao");
+
+    form.addEventListener("submit", async (e) => {
+      e.preventDefault();
+      const nome = document.getElementById("nome").value;
+      const descricao = document.getElementById("descricao").value;
+
+      const res = await fetch("https://irweddchfheymbbreysw.supabase.co/rest/v1/ingestoes", {
+        method: "POST",
+        headers: {
+          "apikey": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Imlyd2VkZGNoZmhleW1iYnJleXN3Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NDQyOTM5NjMsImV4cCI6MjA1OTg2OTk2M30.otuYqFtwNR9huOwiBGaU9MXNbs8xBw2GVVeHzX5QKyU",
+          "Content-Type": "application/json",
+          "Prefer": "return=representation"
+        },
+        body: JSON.stringify({ nome, descricao })
+      });
+
+      if (res.ok) {
+        alert("Dados enviados com sucesso!");
+        form.reset();
+      } else {
+        alert("Erro ao enviar.");
+      }
+    });
+  </script>
+</body>
+</html>
