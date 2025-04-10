@@ -1,133 +1,188 @@
 <!DOCTYPE html>
 <html lang="pt-BR">
-  <head>
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-    <title>Cadastro de Ingestões</title>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600&display=swap" rel="stylesheet" />
-    <style>
-      body {
-        margin: 0;
-        font-family: 'Inter', sans-serif;
-        background-color: #f4f6f8;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        min-height: 100vh;
-      }
-      .container {
-        background-color: white;
-        padding: 2rem 3rem;
-        border-radius: 12px;
-        box-shadow: 0 4px 20px rgba(0,0,0,0.1);
-        max-width: 600px;
-        width: 100%;
-      }
-      h1 {
-        font-size: 24px;
-        margin-bottom: 1.5rem;
-        color: #333;
-        text-align: center;
-      }
-      label {
-        font-weight: 600;
-        margin-bottom: 0.5rem;
-        display: block;
-        color: #444;
-      }
-      input {
-        width: 100%;
-        padding: 0.6rem;
-        margin-bottom: 1.2rem;
-        border: 1px solid #ccc;
-        border-radius: 6px;
-        font-size: 1rem;
-      }
-      button {
-        width: 100%;
-        padding: 0.75rem;
-        background-color: #007bff;
-        color: white;
-        border: none;
-        border-radius: 6px;
-        font-size: 1rem;
-        cursor: pointer;
-        transition: background-color 0.3s;
-      }
-      button:hover {
-        background-color: #0056b3;
-      }
-      .success {
-        color: green;
-        font-weight: 600;
-        text-align: center;
-        margin-top: 1rem;
-      }
-    </style>
-  </head>
-  <body>
-    <div class="container">
-      <h1>Cadastro de Ingestões</h1>
-      <form id="ingest-form">
-        <label for="data">Data</label>
-        <input type="date" id="data" name="data" required />
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>CALCULADORA DE INGEST GRAVAÇÃO</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      background-color: #f4f4f4;
+      padding: 20px;
+      max-width: 900px;
+      margin: auto;
+    }
+    h1 {
+      text-align: center;
+      color: #2c3e50;
+    }
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      margin-top: 20px;
+    }
+    th, td {
+      border: 1px solid #ccc;
+      padding: 8px;
+      text-align: center;
+    }
+    th {
+      background-color: #2980b9;
+      color: white;
+    }
+    input[type="number"] {
+      width: 60px;
+    }
+    .result {
+      font-weight: bold;
+      color: #27ae60;
+    }
+    .controls {
+      margin-top: 20px;
+    }
+    .controls label {
+      margin-right: 10px;
+    }
+    .controls input[type="date"] {
+      margin-right: 20px;
+    }
+    button {
+      margin-right: 10px;
+    }
+  </style>
+</head>
+<body>
+  <h1>CALCULADORA DE INGEST GRAVAÇÃO</h1>
 
-        <label for="pool_id">Pool ID</label>
-        <input type="number" id="pool_id" name="pool_id" required />
+  <div class="controls">
+    <label for="data">Data:</label>
+    <input type="date" id="data">
+  </div>
 
-        <label for="capacidade">Capacidade (horas)</label>
-        <input type="number" id="capacidade" name="capacidade" required />
+  <table>
+    <thead>
+      <tr>
+        <th>POOL</th>
+        <th>Capacidade (h)</th>
+        <th>% Antes</th>
+        <th>% Depois</th>
+        <th>Ingestado (h)</th>
+      </tr>
+    </thead>
+    <tbody id="poolTable">
+      <!-- Linhas serão geradas pelo JS -->
+    </tbody>
+  </table>
 
-        <label for="porcentagem_antes">Porcentagem Antes</label>
-        <input type="number" id="porcentagem_antes" name="porcentagem_antes" step="0.01" required />
+  <div class="controls">
+    <label for="arquivos">Arquivos deletados hoje:</label>
+    <input type="number" id="arquivos" value="0">
+  </div>
 
-        <label for="porcentagem_depois">Porcentagem Depois</label>
-        <input type="number" id="porcentagem_depois" name="porcentagem_depois" step="0.01" required />
+  <div class="controls">
+    <button onclick="calcular()">Calcular</button>
+    <button onclick="salvarDados()">Salvar Dados</button>
+    <button onclick="gerarPDF()">Gerar PDF</button>
+  </div>
 
-        <label for="horas_ingestadas">Horas Ingestadas</label>
-        <input type="number" id="horas_ingestadas" name="horas_ingestadas" step="0.01" required />
+  <div style="margin-top: 20px;">
+    <p class="result" id="totalHoras"></p>
+    <p class="result" id="totalArquivos"></p>
+  </div>
 
-        <label for="arquivos_deletados">Arquivos Deletados</label>
-        <input type="number" id="arquivos_deletados" name="arquivos_deletados" required />
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+  <script>
+    const pools = [
+      { id: 1, capacidade: 560 },
+      { id: 2, capacidade: 560 },
+      { id: 7, capacidade: 560 },
+      { id: 3, capacidade: 560 },
+      { id: 4, capacidade: 560 },
+      { id: 8, capacidade: 1120 }
+    ];
 
-        <button type="submit">Enviar</button>
-        <div class="success" id="success-message" style="display: none;">Enviado com sucesso!</div>
-      </form>
-    </div>
+    const tabela = document.getElementById("poolTable");
 
-    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js"></script>
-    <script>
-      const form = document.getElementById('ingest-form');
-      const successMessage = document.getElementById('success-message');
+    pools.forEach(pool => {
+      const row = document.createElement("tr");
+      row.innerHTML = `
+        <td>${pool.id}</td>
+        <td>${pool.capacidade}</td>
+        <td><input type="number" id="antes-${pool.id}" min="0" max="100"></td>
+        <td><input type="number" id="depois-${pool.id}" min="0" max="100"></td>
+        <td id="resultado-${pool.id}" class="result">-</td>
+      `;
+      tabela.appendChild(row);
+    });
 
-      const supabase = supabase.createClient(
-        'https://irweddchfheymbbreysw.supabase.co',
-        'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Imlyd2VkZGNoZmhleW1iYnJleXN3Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NDQyOTM5NjMsImV4cCI6MjA1OTg2OTk2M30.otuYqFtwNR9huOwiBGaU9MXNbs8xBw2GVVeHzX5QKyU'
-      );
+    function calcular() {
+      let total = 0;
 
-      form.addEventListener('submit', async (e) => {
-        e.preventDefault();
-
-        const data = {
-          data: document.getElementById('data').value,
-          pool_id: parseInt(document.getElementById('pool_id').value),
-          capacidade: parseInt(document.getElementById('capacidade').value),
-          porcentagem_antes: parseFloat(document.getElementById('porcentagem_antes').value),
-          porcentagem_depois: parseFloat(document.getElementById('porcentagem_depois').value),
-          horas_ingestadas: parseFloat(document.getElementById('horas_ingestadas').value),
-          arquivos_deletados: parseInt(document.getElementById('arquivos_deletados').value)
-        };
-
-        const { error } = await supabase.from('ingestoes').insert([data]);
-
-        if (!error) {
-          successMessage.style.display = 'block';
-          form.reset();
-          setTimeout(() => successMessage.style.display = 'none', 4000);
-        } else {
-          alert('Erro ao enviar: ' + error.message);
-        }
+      pools.forEach(pool => {
+        const antes = parseFloat(document.getElementById(`antes-${pool.id}`).value) || 0;
+        const depois = parseFloat(document.getElementById(`depois-${pool.id}`).value) || 0;
+        const diferenca = antes - depois;
+        const horas = (pool.capacidade * diferenca / 100).toFixed(2);
+        document.getElementById(`resultado-${pool.id}`).textContent = horas;
+        total += parseFloat(horas);
       });
-    </script>
-  </body>
+
+      const arquivos = parseInt(document.getElementById("arquivos").value) || 0;
+
+      document.getElementById("totalHoras").textContent = `Total de horas ingestadas: ${total.toFixed(2)} h`;
+      document.getElementById("totalArquivos").textContent = `Total de arquivos deletados: ${arquivos}`;
+    }
+
+    function salvarDados() {
+      const data = document.getElementById("data").value;
+      const arquivos = document.getElementById("arquivos").value;
+      const totalHoras = document.getElementById("totalHoras").textContent;
+      const totalArquivos = document.getElementById("totalArquivos").textContent;
+
+      let linhas = pools.map(pool => {
+        const antes = document.getElementById(`antes-${pool.id}`).value;
+        const depois = document.getElementById(`depois-${pool.id}`).value;
+        const ingestado = document.getElementById(`resultado-${pool.id}`).textContent;
+        return `Pool ${pool.id}: ${antes}% → ${depois}%, Ingestado: ${ingestado}h`;
+      }).join("\n");
+
+      const conteudo = `Data: ${data}\n${linhas}\n${totalHoras}\n${totalArquivos}`;
+      const blob = new Blob([conteudo], { type: "text/plain" });
+      const link = document.createElement("a");
+      link.href = URL.createObjectURL(blob);
+      link.download = `relatorio_ingest_${data}.txt`;
+      link.click();
+    }
+
+    async function gerarPDF() {
+      const doc = new jspdf.jsPDF();
+      const data = document.getElementById("data").value;
+      let y = 10;
+
+      doc.text(`Relatório de Ingest - Data: ${data}`, 10, y);
+      y += 10;
+
+      pools.forEach(pool => {
+        const antes = document.getElementById(`antes-${pool.id}`).value;
+        const depois = document.getElementById(`depois-${pool.id}`).value;
+        const ingestado = document.getElementById(`resultado-${pool.id}`).textContent;
+        doc.text(`Pool ${pool.id}: ${antes}% → ${depois}%, Ingestado: ${ingestado}h`, 10, y);
+        y += 10;
+      });
+
+      y += 5;
+      doc.text(document.getElementById("totalHoras").textContent, 10, y);
+      y += 10;
+      doc.text(document.getElementById("totalArquivos").textContent, 10, y);
+
+      doc.save(`relatorio_ingest_${data}.pdf`);
+    }
+
+    // Preenche a data atual automaticamente
+    window.onload = () => {
+      const hoje = new Date().toISOString().split('T')[0];
+      document.getElementById("data").value = hoje;
+    };
+  </script>
+</body>
 </html>
