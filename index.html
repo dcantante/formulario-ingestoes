@@ -1,71 +1,133 @@
 <!DOCTYPE html>
 <html lang="pt-BR">
-<head>
-  <meta charset="UTF-8" />
-  <title>Controle de Ingestões - Quantel</title>
-</head>
-<body>
-  <h1>Controle de Ingestões</h1>
-  <form id="ingestao-form">
-    <label>Data:
-      <input type="date" name="data" required>
-    </label><br><br>
-
-    <label>Pool ID:
-      <input type="number" name="pool_id" required>
-    </label><br><br>
-
-    <label>Capacidade (horas):
-      <input type="number" name="capacidade" required>
-    </label><br><br>
-
-    <label>Porcentagem Antes:
-      <input type="number" step="0.1" name="porcentagem_antes" required>
-    </label><br><br>
-
-    <label>Porcentagem Depois:
-      <input type="number" step="0.1" name="porcentagem_depois" required>
-    </label><br><br>
-
-    <label>Horas Ingestadas:
-      <input type="number" step="0.1" name="horas_ingestadas" required>
-    </label><br><br>
-
-    <label>Arquivos Deletados:
-      <input type="number" name="arquivos_deletados" required>
-    </label><br><br>
-
-    <button type="submit">Enviar</button>
-  </form>
-
-  <script>
-    const form = document.getElementById("ingestao-form");
-    form.addEventListener("submit", async (e) => {
-      e.preventDefault();
-
-      const formData = new FormData(form);
-      const data = {};
-      formData.forEach((value, key) => {
-        data[key] = value;
-      });
-
-      const response = await fetch("https://irweddchfheymbbreysw.supabase.co/rest/v1/ingestoes", {
-        method: "POST",
-        headers: {
-          apikey: "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Imlyd2VkZGNoZmhleW1iYnJleXN3Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NDQyOTM5NjMsImV4cCI6MjA1OTg2OTk2M30.otuYqFtwNR9huOwiBGaU9MXNbs8xBw2GVVeHzX5QKyU",
-          Authorization: "Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Imlyd2VkZGNoZmhleW1iYnJleXN3Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NDQyOTM5NjMsImV4cCI6MjA1OTg2OTk2M30.otuYqFtwNR9huOwiBGaU9MXNbs8xBw2GVVeHzX5QKyU",
-          "Content-Type": "application/json"
-        },
-        body: JSON.stringify(data)
-      });
-
-      if (response.ok) {
-        alert("Dados enviados com sucesso!");
-        form.reset();
-      } else {
-        alert("Erro ao enviar dados.");
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+    <title>Cadastro de Ingestões</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600&display=swap" rel="stylesheet" />
+    <style>
+      body {
+        margin: 0;
+        font-family: 'Inter', sans-serif;
+        background-color: #f4f6f8;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        min-height: 100vh;
       }
-    });
-  </script>
-</body>
+      .container {
+        background-color: white;
+        padding: 2rem 3rem;
+        border-radius: 12px;
+        box-shadow: 0 4px 20px rgba(0,0,0,0.1);
+        max-width: 600px;
+        width: 100%;
+      }
+      h1 {
+        font-size: 24px;
+        margin-bottom: 1.5rem;
+        color: #333;
+        text-align: center;
+      }
+      label {
+        font-weight: 600;
+        margin-bottom: 0.5rem;
+        display: block;
+        color: #444;
+      }
+      input {
+        width: 100%;
+        padding: 0.6rem;
+        margin-bottom: 1.2rem;
+        border: 1px solid #ccc;
+        border-radius: 6px;
+        font-size: 1rem;
+      }
+      button {
+        width: 100%;
+        padding: 0.75rem;
+        background-color: #007bff;
+        color: white;
+        border: none;
+        border-radius: 6px;
+        font-size: 1rem;
+        cursor: pointer;
+        transition: background-color 0.3s;
+      }
+      button:hover {
+        background-color: #0056b3;
+      }
+      .success {
+        color: green;
+        font-weight: 600;
+        text-align: center;
+        margin-top: 1rem;
+      }
+    </style>
+  </head>
+  <body>
+    <div class="container">
+      <h1>Cadastro de Ingestões</h1>
+      <form id="ingest-form">
+        <label for="data">Data</label>
+        <input type="date" id="data" name="data" required />
+
+        <label for="pool_id">Pool ID</label>
+        <input type="number" id="pool_id" name="pool_id" required />
+
+        <label for="capacidade">Capacidade (horas)</label>
+        <input type="number" id="capacidade" name="capacidade" required />
+
+        <label for="porcentagem_antes">Porcentagem Antes</label>
+        <input type="number" id="porcentagem_antes" name="porcentagem_antes" step="0.01" required />
+
+        <label for="porcentagem_depois">Porcentagem Depois</label>
+        <input type="number" id="porcentagem_depois" name="porcentagem_depois" step="0.01" required />
+
+        <label for="horas_ingestadas">Horas Ingestadas</label>
+        <input type="number" id="horas_ingestadas" name="horas_ingestadas" step="0.01" required />
+
+        <label for="arquivos_deletados">Arquivos Deletados</label>
+        <input type="number" id="arquivos_deletados" name="arquivos_deletados" required />
+
+        <button type="submit">Enviar</button>
+        <div class="success" id="success-message" style="display: none;">Enviado com sucesso!</div>
+      </form>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js"></script>
+    <script>
+      const form = document.getElementById('ingest-form');
+      const successMessage = document.getElementById('success-message');
+
+      const supabase = supabase.createClient(
+        'https://irweddchfheymbbreysw.supabase.co',
+        'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Imlyd2VkZGNoZmhleW1iYnJleXN3Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NDQyOTM5NjMsImV4cCI6MjA1OTg2OTk2M30.otuYqFtwNR9huOwiBGaU9MXNbs8xBw2GVVeHzX5QKyU'
+      );
+
+      form.addEventListener('submit', async (e) => {
+        e.preventDefault();
+
+        const data = {
+          data: document.getElementById('data').value,
+          pool_id: parseInt(document.getElementById('pool_id').value),
+          capacidade: parseInt(document.getElementById('capacidade').value),
+          porcentagem_antes: parseFloat(document.getElementById('porcentagem_antes').value),
+          porcentagem_depois: parseFloat(document.getElementById('porcentagem_depois').value),
+          horas_ingestadas: parseFloat(document.getElementById('horas_ingestadas').value),
+          arquivos_deletados: parseInt(document.getElementById('arquivos_deletados').value)
+        };
+
+        const { error } = await supabase.from('ingestoes').insert([data]);
+
+        if (!error) {
+          successMessage.style.display = 'block';
+          form.reset();
+          setTimeout(() => successMessage.style.display = 'none', 4000);
+        } else {
+          alert('Erro ao enviar: ' + error.message);
+        }
+      });
+    </script>
+  </body>
 </html>
