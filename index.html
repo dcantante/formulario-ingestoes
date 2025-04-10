@@ -1,43 +1,69 @@
 <!DOCTYPE html>
-<html>
+<html lang="pt-BR">
 <head>
-  <title>Formulário de Ingestões</title>
+  <meta charset="UTF-8" />
+  <title>Controle de Ingestões - Quantel</title>
 </head>
 <body>
-  <h1>Cadastro de Ingestões</h1>
-  <form id="form-ingestao">
-    <label for="nome">Nome:</label><br />
-    <input type="text" id="nome" name="nome" required><br /><br />
-    
-    <label for="descricao">Descrição:</label><br />
-    <input type="text" id="descricao" name="descricao" required><br /><br />
+  <h1>Controle de Ingestões</h1>
+  <form id="ingestao-form">
+    <label>Data:
+      <input type="date" name="data" required>
+    </label><br><br>
+
+    <label>Pool ID:
+      <input type="number" name="pool_id" required>
+    </label><br><br>
+
+    <label>Capacidade (horas):
+      <input type="number" name="capacidade" required>
+    </label><br><br>
+
+    <label>Porcentagem Antes:
+      <input type="number" step="0.1" name="porcentagem_antes" required>
+    </label><br><br>
+
+    <label>Porcentagem Depois:
+      <input type="number" step="0.1" name="porcentagem_depois" required>
+    </label><br><br>
+
+    <label>Horas Ingestadas:
+      <input type="number" step="0.1" name="horas_ingestadas" required>
+    </label><br><br>
+
+    <label>Arquivos Deletados:
+      <input type="number" name="arquivos_deletados" required>
+    </label><br><br>
 
     <button type="submit">Enviar</button>
   </form>
 
   <script>
-    const form = document.getElementById("form-ingestao");
-
+    const form = document.getElementById("ingestao-form");
     form.addEventListener("submit", async (e) => {
       e.preventDefault();
-      const nome = document.getElementById("nome").value;
-      const descricao = document.getElementById("descricao").value;
 
-      const res = await fetch("https://irweddchfheymbbreysw.supabase.co/rest/v1/ingestoes", {
-        method: "POST",
-        headers: {
-          "apikey": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Imlyd2VkZGNoZmhleW1iYnJleXN3Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NDQyOTM5NjMsImV4cCI6MjA1OTg2OTk2M30.otuYqFtwNR9huOwiBGaU9MXNbs8xBw2GVVeHzX5QKyU",
-          "Content-Type": "application/json",
-          "Prefer": "return=representation"
-        },
-        body: JSON.stringify({ nome, descricao })
+      const formData = new FormData(form);
+      const data = {};
+      formData.forEach((value, key) => {
+        data[key] = value;
       });
 
-      if (res.ok) {
+      const response = await fetch("https://irweddchfheymbbreysw.supabase.co/rest/v1/ingestoes", {
+        method: "POST",
+        headers: {
+          apikey: "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Imlyd2VkZGNoZmhleW1iYnJleXN3Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NDQyOTM5NjMsImV4cCI6MjA1OTg2OTk2M30.otuYqFtwNR9huOwiBGaU9MXNbs8xBw2GVVeHzX5QKyU",
+          Authorization: "Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Imlyd2VkZGNoZmhleW1iYnJleXN3Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NDQyOTM5NjMsImV4cCI6MjA1OTg2OTk2M30.otuYqFtwNR9huOwiBGaU9MXNbs8xBw2GVVeHzX5QKyU",
+          "Content-Type": "application/json"
+        },
+        body: JSON.stringify(data)
+      });
+
+      if (response.ok) {
         alert("Dados enviados com sucesso!");
         form.reset();
       } else {
-        alert("Erro ao enviar.");
+        alert("Erro ao enviar dados.");
       }
     });
   </script>
